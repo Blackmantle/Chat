@@ -5,7 +5,7 @@ import './App.sass';
 function App() {
   return (
     <div className="App">
-      <Chat wsURL="ws://st-chat.shas.tel" />
+      <Chat wsURL="wss://wssproxy.herokuapp.com/" />
     </div>
   );
 }
