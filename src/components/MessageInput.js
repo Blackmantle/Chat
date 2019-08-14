@@ -3,10 +3,12 @@ import propTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import TextField from '@material-ui/core/TextField';
+import useGlobal from '../store';
 import './MessageInput.sass';
 
 function MessageInput({ webSocket }) {
   const [inputValue, setInputValue] = useState('');
+  const globalState = useGlobal()[0];
 
   function handleChange(e) {
     setInputValue(e.target.value);
@@ -15,7 +17,11 @@ function MessageInput({ webSocket }) {
   function sendMessage(e) {
     e.preventDefault();
     if (inputValue.trim().length) {
-      const data = { from: 'sssssssssss', message: inputValue };
+      const userName = globalState.userName.trim().replace(/\s+/g, ' ');
+      const data = {
+        from: userName.length ? userName : 'User',
+        message: inputValue,
+      };
       webSocket.send(JSON.stringify(data));
       setInputValue('');
     }

@@ -27,6 +27,7 @@
       "no-use-before-define": 0,
       "no-console": 0,
       "react/jsx-filename-extension": 0,
-      "object-curly-newline": 0
+      "object-curly-newline": 0,
+      "import/prefer-default-export": 0
     }
 }

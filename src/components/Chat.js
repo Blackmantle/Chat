@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import propTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/min/locales.min';
+import UserNameInput from './UserNameInput';
 import Progress from './Progress';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
@@ -67,6 +68,7 @@ function Chat({ wsURL }) {
           )
           : (
             <>
+              <UserNameInput />
               <MessageList messages={messages} />
               <MessageInput webSocket={webSocket} />
             </>
