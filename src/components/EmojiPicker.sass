@@ -1,0 +1,18 @@
+.emoji
+  $self: &
+  position: relative
+  &:hover
+    #{ $self }__picker
+      opacity: 1
+      visibility: visible
+  &__picker
+    position: absolute
+    right: 0
+    bottom: 30px
+    opacity: 0
+    visibility: hidden
+    transition: all 0.3s ease
+  &__icon
+    font-size: 20px
+    color: #1A5276
+    cursor: pointer

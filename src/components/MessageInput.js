@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import TextField from '@material-ui/core/TextField';
+import EmojiPicker from './EmojiPicker';
 import useGlobal from '../store';
 import './MessageInput.sass';
 
@@ -12,6 +13,10 @@ function MessageInput({ webSocket }) {
 
   function handleChange(e) {
     setInputValue(e.target.value);
+  }
+
+  function selectEmoji({ native }) {
+    setInputValue((prevValue) => prevValue + native);
   }
 
   function sendMessage(e) {
@@ -33,10 +38,10 @@ function MessageInput({ webSocket }) {
         label="Напишите сообщение..."
         value={inputValue}
         onChange={handleChange}
-        onSubmit={sendMessage}
         variant="outlined"
         fullWidth
       />
+      <EmojiPicker onSelect={selectEmoji} />
       <button className="message-input__send" type="submit" title="Отправить">
         <FontAwesomeIcon icon={faPaperPlane} />
       </button>
