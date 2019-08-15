@@ -14,14 +14,14 @@ function MessageInput({ webSocket }) {
 
   useEffect(() => {
     const setFocusToInput = (e) => {
-      if (e.target.tagName !== 'INPUT') {
+      if (e.target.tagName !== 'INPUT' && e.key.length === 1) {
         inputRef.current.focus();
       }
     };
 
-    window.addEventListener('keydown', setFocusToInput);
+    window.addEventListener('keypress', setFocusToInput);
     return () => {
-      window.removeEventListener('keydown', setFocusToInput);
+      window.removeEventListener('keypress', setFocusToInput);
     };
   }, []);
 
@@ -42,6 +42,9 @@ function MessageInput({ webSocket }) {
       };
       webSocket.send(JSON.stringify(data));
       setInputValue('');
+
+      // scroll to bottom
+      document.body.scrollIntoView(false);
     }
   }
 

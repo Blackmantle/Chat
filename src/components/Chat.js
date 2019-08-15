@@ -27,21 +27,24 @@ function Chat({ wsURL }) {
         setTimeout(() => createWebSocket(), 5000);
       };
 
-      ws.onerror = (e) => {
-        console.log(e);
-        ws.close();
-      };
+      ws.onerror = () => ws.close();
 
+      let isFirstMessage = true;
       ws.onmessage = ({ data }) => {
         const dataSortedByTime = JSON.parse(data).sort((a, b) => a.time - b.time);
         setMessages((prevData) => [...prevData, ...dataSortedByTime]);
-        document.body.scrollIntoView(false);
+
+        // auto scroll down
+        const { pageYOffset, innerHeight } = window;
+        const isScrollAtBottom = document.body.scrollHeight - pageYOffset - innerHeight <= 200;
+        if (isFirstMessage || isScrollAtBottom) {
+          document.body.scrollIntoView(false);
+          isFirstMessage = false;
+        }
 
         // notification of new messages
         if (!document.hasFocus()) {
-          const sound = new Audio(notificationSound);
-          sound.play().catch((e) => console.log(e));
-
+          new Audio(notificationSound).play();
           const prevMessagesCount = parseInt(document.title, 10);
           const curMessagesCount = dataSortedByTime.length;
           document.title = isNaN(prevMessagesCount)
