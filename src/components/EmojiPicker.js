@@ -9,9 +9,9 @@ import './EmojiPicker.sass';
 function EmojiPicker({ onSelect }) {
   return (
     <div className="emoji">
-      <form className="emoji__picker">
+      <div className="emoji__picker">
         <Picker set="emojione" title="Pick your emoji…" onSelect={onSelect} />
-      </form>
+      </div>
       <FontAwesomeIcon className="emoji__icon" icon={faLaugh} />
     </div>
   );

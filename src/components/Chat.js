@@ -27,7 +27,10 @@ function Chat({ wsURL }) {
         setTimeout(() => createWebSocket(), 5000);
       };
 
-      ws.onerror = () => ws.close();
+      ws.onerror = (e) => {
+        console.log(e);
+        ws.close();
+      };
 
       ws.onmessage = ({ data }) => {
         const dataSortedByTime = JSON.parse(data).sort((a, b) => a.time - b.time);
@@ -36,7 +39,9 @@ function Chat({ wsURL }) {
 
         // notification of new messages
         if (!document.hasFocus()) {
-          new Audio(notificationSound).play();
+          const sound = new Audio(notificationSound);
+          sound.play().catch((e) => console.log(e));
+
           const prevMessagesCount = parseInt(document.title, 10);
           const curMessagesCount = dataSortedByTime.length;
           document.title = isNaN(prevMessagesCount)
