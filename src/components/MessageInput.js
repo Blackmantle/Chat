@@ -1,18 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
+/* eslint-disable no-param-reassign */
+import React, { useEffect } from 'react';
 import propTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import TextField from '@material-ui/core/TextField';
 import EmojiPicker from './EmojiPicker';
 import useGlobal from '../store';
 import './MessageInput.sass';
 
-function MessageInput({ webSocket }) {
-  const [inputValue, setInputValue] = useState('');
+function MessageInput({ webSocket, inputRef }) {
   const globalState = useGlobal()[0];
-  const inputRef = useRef();
 
   useEffect(() => {
+    const hashedInputValue = localStorage.getItem('messageInputValue');
+    if (hashedInputValue) {
+      inputRef.current.value = hashedInputValue;
+    }
+
+    // set focus to input if a printable key was pressed in window
     const setFocusToInput = (e) => {
       if (e.target.tagName !== 'INPUT' && e.key.length === 1) {
         inputRef.current.focus();
@@ -23,25 +27,30 @@ function MessageInput({ webSocket }) {
     return () => {
       window.removeEventListener('keypress', setFocusToInput);
     };
-  }, []);
+  }, [inputRef]);
 
   function handleChange(e) {
-    setInputValue(e.target.value);
+    const { value } = e.target;
+    inputRef.current.value = value;
+    localStorage.setItem('messageInputValue', value);
   }
 
   function selectEmoji({ native }) {
-    setInputValue((prevValue) => prevValue + native);
+    inputRef.current.value += native;
+    inputRef.current.focus();
   }
 
   function sendMessage() {
-    if (inputValue.trim().length) {
+    const messageInput = inputRef.current;
+    if (messageInput.value.trim().length) {
       const userName = globalState.userName.trim().replace(/\s+/g, ' ');
       const data = {
         from: userName.length ? userName : 'User',
-        message: inputValue,
+        message: messageInput.value,
       };
       webSocket.send(JSON.stringify(data));
-      setInputValue('');
+      messageInput.value = '';
+      localStorage.removeItem('messageInputValue');
 
       // scroll to bottom
       document.body.scrollIntoView(false);
@@ -56,14 +65,12 @@ function MessageInput({ webSocket }) {
         sendMessage();
       }}
     >
-      <TextField
-        inputRef={inputRef}
-        value={inputValue}
+      <input
+        className="message-input__input"
+        ref={inputRef}
         onChange={handleChange}
         onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-        label="Напишите сообщение..."
-        variant="outlined"
-        fullWidth
+        placeholder="Напишите сообщение..."
       />
       <EmojiPicker onSelect={selectEmoji} />
       <button className="message-input__send" type="submit" title="Отправить">
@@ -77,6 +84,13 @@ MessageInput.propTypes = {
   webSocket: propTypes.shape({
     send: propTypes.func.isRequired,
   }).isRequired,
+  inputRef: propTypes.shape({
+    current: propTypes.object,
+  }),
+};
+
+MessageInput.defaultProps = {
+  inputRef: {},
 };
 
 export default MessageInput;

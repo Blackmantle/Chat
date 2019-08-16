@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import propTypes from 'prop-types';
 import moment from 'moment';
 import 'moment/min/locales.min';
@@ -13,6 +13,7 @@ function Chat({ wsURL }) {
   const [messages, setMessages] = useState([]);
   const [webSocket, setWebSocket] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const messageInputRef = useRef();
 
   useEffect(() => {
     (function createWebSocket() {
@@ -39,7 +40,6 @@ function Chat({ wsURL }) {
         const isScrollAtBottom = document.body.scrollHeight - pageYOffset - innerHeight <= 200;
         if (isFirstMessage || isScrollAtBottom) {
           document.body.scrollIntoView(false);
-          isFirstMessage = false;
         }
 
         // notification of new messages
@@ -51,19 +51,32 @@ function Chat({ wsURL }) {
             ? `${curMessagesCount} новых сообщений`
             : `${prevMessagesCount + curMessagesCount} новых сообщений`;
         }
+
+        isFirstMessage = false;
       };
 
       setWebSocket(ws);
     }());
 
-    window.addEventListener('focus', () => {
-      document.title = 'Чат';
-    });
-
     moment.locale('ru');
 
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    function setInitialTitle() {
+      document.title = 'Чат';
+    }
+
+    if (isLoading) {
+      document.title = 'Подключение...';
+    } else {
+      setInitialTitle();
+      window.addEventListener('focus', setInitialTitle);
+    }
+
+    return () => window.removeEventListener('focus', setInitialTitle);
+  }, [isLoading]);
 
   return (
     <div className="chat">
@@ -77,8 +90,14 @@ function Chat({ wsURL }) {
           : (
             <>
               <UserNameInput />
-              <MessageList messages={messages} />
-              <MessageInput webSocket={webSocket} />
+              <MessageList
+                messages={messages}
+                messageInputRef={messageInputRef}
+              />
+              <MessageInput
+                webSocket={webSocket}
+                inputRef={messageInputRef}
+              />
             </>
           )
       }

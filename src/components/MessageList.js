@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 import Message from './Message';
 import './MessageList.sass';
 
-function MessageList({ messages }) {
+function MessageList({ messages, messageInputRef }) {
   return (
     <div className="message-list">
       {
@@ -13,6 +13,7 @@ function MessageList({ messages }) {
             time={time}
             from={from}
             message={message}
+            messageInputRef={messageInputRef}
           />
         ))
       }
@@ -29,6 +30,13 @@ MessageList.propTypes = {
       message: propTypes.string.isRequired,
     }).isRequired,
   ).isRequired,
+  messageInputRef: propTypes.shape({
+    current: propTypes.object,
+  }),
+};
+
+MessageList.defaultProps = {
+  messageInputRef: {},
 };
 
 export default MessageList;
